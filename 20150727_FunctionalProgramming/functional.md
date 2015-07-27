@@ -7,7 +7,6 @@ class: middle, center, inverse
 .footnote[David Wang (From CA team)]
 
 ---
-
 # Agenda
 
 1. The Paradigms of Programming
@@ -25,7 +24,43 @@ class: middle, center, inverse
 9. Book Recommondation
 
 ---
-
 class: middle, center, inverse
 
 # Paradigms of Programming
+
+---
+class: middle, large-list
+
+- Imperative
+    - Procedural
+    - Object Oriented
+- Declarative
+    - Functional
+    - Logical
+    - DSL (Regex, SQL, Configuration etc)
+
+---
+count: false
+class: middle, large-list
+
+- Imperative
+    - Procedural
+    - Object Oriented
+- Declarative
+    -  **Functional**
+    - Logical
+    - DSL (Regex, SQL, Configuration etc)
+
+---
+# Alan Turing
+.width40[.center[![Turing](image/turing.jpg)]]
+
+---
+# Turing Machine
+.width90[.center[![Machine](image/turing_machine.jpg)]]
+
+---
+# Alonzo Church
+.width30[.center[![Church](image/church.jpg)]]
+
+Church was an American mathematician, who is best known for the lambda calculus, Church–Turing thesis, proving the undecidability of the Entscheidungsproblem, Frege–Church ontology, and the Church–Rosser theorem.
