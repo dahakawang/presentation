@@ -64,3 +64,8 @@ class: middle, large-list
 .width30[.center[![Church](image/church.jpg)]]
 
 Church was an American mathematician, who is best known for the lambda calculus, Church–Turing thesis, proving the undecidability of the Entscheidungsproblem, Frege–Church ontology, and the Church–Rosser theorem.
+
+---
+class: middle, center, inverse
+
+# LISP in 5 Minutes :-)
