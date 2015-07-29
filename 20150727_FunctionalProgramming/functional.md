@@ -413,7 +413,80 @@ public class MyAndroidAppActivity extends Activity {
 ---
 # Old days with C
 ```C
+// This is not closure, since it can't capture the environment
+int cmpfunc (const void * a, const void * b)
+{
+   return ( *(int*)a - *(int*)b );
+}
+
 int values[] = { 88, 56, 100, 2, 25 };
 qsort(array, 5, sizeof(int), cmpfunc);
 
 ```
+
+--
+We can only capture the environment manually.
+
+```C
+void *inc_x(void *x_void_ptr) {
+    int* x = (int*)x_void_ptr;
+}
+
+int main() {
+    pthread_t inc_x_thread;
+    int x;
+    if(pthread_create(&inc_x_thread, NULL, inc_x, &x)) {
+        fprintf(stderr, "Error creating thread\n");
+        return 1;
+    }
+}
+```
+
+---
+# A better time with C++ functor
+
+```c++
+class Adder {
+public:
+    Adder(int n):num(n) {};
+    int operator()(int x) { return x + num; }
+
+pricate:
+    int num;
+};
+
+template<typename T>
+void caller(T& callback) {
+    callback(12); 
+}
+
+int x = 10;
+Adder adder(x); // capture value manually
+caller(adder);
+
+```
+
+---
+# C++ Lambda
+
+```c++
+[capture](args) { expresions; };
+
+// pass in an lambda
+for_each(v.begin(), v.end(), [](const T& item) { cout << item << endl; });
+
+// return a lambda
+function(void(int)> get();
+
+
+string str = "hello"
+// capture by value
+[str]() { str = "change not propagate to outside"; };
+
+// capture by reference
+[&str]() { str = "change propagate to outside"; };
+
+// capture all used
+[=]() { cout << "all used variables will be captured" };
+```
+
