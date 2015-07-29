@@ -194,3 +194,69 @@ count: false
 --
 count: false
 - In Haskell: Monad
+
+
+---
+# The functional way
+
+```LISP
+(define (factorial n)
+  (if (= n 1)
+      1
+      ( * n (factorial (- n 1)))))
+
+(factorial 4)
+```
+
+--
+count: false
+$$f(x)=\begin{cases}1 & x = 1 \\ x \times f(x-1) & x > 1\end{cases}, x\in (0, +\infty)$$
+
+---
+# The non-functional way
+
+```C
+// okay if you don't think imperatively
+int factorial(int x) {
+    if (x == 1) {
+        return 1;
+    } else {
+        return x*factorial(x-1);
+    }
+}
+
+// uses destructive update
+int factorial(int x) {
+    int result = 1;
+    for (int i = 1; i <= x; i++) {
+        result *= i;
+    }
+
+    return result;
+}
+```
+
+---
+# The substitution model
+
+```LISP
+; expansion
+(factorial 4)
+(* 4 (factorial (- 4 1)))
+(* 4 (* (- 4 1) (factorial (- (- 4 1) 1))))
+(* 4 (* (- 4 1) (* (- (- 4 1) 1) (factorial (- (- (- 4 1) 1) 1)))))
+
+; reducing
+(* 4 (* (- 4 1) (* (- (- 4 1) 1) (factorial (- (- 3 1) 1)))))
+(* 4 (* (- 4 1) (* (- (- 4 1) 1) (factorial (- 2 1)))))
+(* 4 (* (- 4 1) (* (- (- 4 1) 1) (factorial 1))))
+(* 4 (* (- 4 1) (* (- (- 4 1) 1) 1)))
+(* 4 (* (- 4 1) (* (- 3 1) 1)))
+(* 4 (* (- 4 1) (* 2 1)))
+(* 4 (* (- 4 1) 2))
+(* 4 (* 3 2))
+(* 4 6)
+24
+```
+
+LISP == LISt Processing
