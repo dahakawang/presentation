@@ -621,3 +621,38 @@ int main() {
 ---
 class: middle, center, inverse
 # C++ Templates are Turing Complete
+
+
+---
+# Prolog
+
+Fact, Rule, Query, KnowledgeBase
+
+```prolog
+happy(david).
+happy(kevin).
+praised(kevin).
+party.
+?- happy(david). % yes
+?- happy(sam).   % no
+?- party.        % yes
+
+sing(david):- happy(david),praised(david).
+sing(kevin):- happy(kevin),praised(kevin).
+?- sing(david).  % no
+?- sing(kevin).  % yes
+
+
+loves(ken,marry). 
+loves(vincent ,marry). 
+loves(jun, sam). 
+loves(sam, jun). 
+jealous(X,Y):-  loves(X,Z),  loves(Y,Z).
+
+?- jealous(vincent, W).  % W = ken
+
+?-  8  is  6+2.  % yes
+?-  X  is  6+2.  % X = 8
+
+```
+We are not computing, we are reasoning.
