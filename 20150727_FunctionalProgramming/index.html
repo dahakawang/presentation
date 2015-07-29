@@ -22,7 +22,7 @@
         right: 6em;
       }
       .emphasis { color: #fa0000; font-weight: bold }
-      .width40 img { width: 43%; }
+      .width41 img { width: 15em; }
       .width30 img { width: 35%; }
       .width90 img { width: 90%; }
       li p { line-height: 1.25em; }
@@ -102,8 +102,7 @@
       }
       /* Two-column layout */
       .left-column {
-        color: #777;
-        width: 20%;
+        width: 48%;
         height: 92%;
         float: left;
       }
@@ -111,7 +110,7 @@
           color: #000;
         }
       .right-column {
-        width: 75%;
+        width: 40%;
         float: right;
         padding-top: 1em;
       }
@@ -119,8 +118,26 @@
   </head>
   <body>
     <script src="https://gnab.github.io/remark/downloads/remark-latest.min.js"></script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML&delayStartupUntil=configured" type="text/javascript"></script>
     <script>
-      var slideshow = remark.create({ sourceUrl: 'functional.md' });
+      var slideshow = remark.create({ 
+        sourceUrl: 'functional.md',
+        highlightStyle: 'monokai'
+      });
+
+      // Setup MathJax
+      MathJax.Hub.Config({
+          tex2jax: {
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+          }
+      });
+      MathJax.Hub.Queue(function() {
+          $(MathJax.Hub.getAllJax()).map(function(index, elem) {
+              return(elem.SourceElement());
+          }).parent().addClass('has-jax');
+      });
+
+      MathJax.Hub.Configured();
     </script>
   </body>
 </html>
