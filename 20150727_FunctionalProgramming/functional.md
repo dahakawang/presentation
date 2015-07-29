@@ -74,14 +74,7 @@ Church was an American mathematician, who is best known for the lambda calculus,
 
 ---
 class: middle, center, inverse
-
-# LISP in 5 Minutes :-)
-=======
-
----
-class: middle, center, inverse
 # LISP in 5 Minutes
-
 
 ---
 # Core language
