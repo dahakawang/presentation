@@ -260,3 +260,162 @@ int factorial(int x) {
 ```
 
 LISP == LISt Processing
+
+---
+class: middle, center, inverse 
+
+# Closure
+
+---
+
+# Many alias
+
+- Closure
+- Lambda
+- Anonymous function
+--
+count: false
+- lexically scoped name binding
+
+---
+# So what the heck is lexical scope?
+
+In javascript
+```js
+var p1 = 1
+
+function sub1() {
+    var p2 = 2
+
+    function sub2() {
+        var p3 = 2
+
+        function sub3() {
+            var p4 = 2
+            return "hello";
+        }
+
+        return sub3;
+    }
+
+    return sub2;
+}
+```
+
+---
+# Not be confused with calling stack
+
+.left-column[
+```js
+// the function that returns a closure
+function generator() {
+    var private_var = 1234;
+
+    return function() {
+        console.log(private_var);
+    }
+}
+
+
+// the caller that calls a closure
+function caller(f) {
+    f();
+}
+
+
+caller(generator());
+
+
+
+
+
+
+// EOF
+```
+]
+
+
+---
+class: middle, center, inverse
+# Closure = Function + Environment
+requires that function is just like a primitive data type (first class), and can be passed back and forth as parameters to other function.(higher order function)
+
+---
+# Lambda Expression
+
+- Borrowed name from Lambda Calculus
+- Java 8, C++ 11, python name after this
+
+
+---
+# Anonymous Function isn't a good name
+
+Also an example from js
+
+```js
+function closure_but_not_anonymous() {
+    var im_private_env1 = 1;
+
+    function i_have_a_name() {
+        console.log("i have a name");
+    };
+
+    return i_have_a_name;
+}
+
+
+function closure_with_anonymoous_function() {
+    var im_private_env2 = 2;
+
+    return () {
+        console.log("i'm anonymous");
+    };
+}
+```
+
+---
+class: center, middle
+# Javascript has closure from the first day
+
+---
+# Remember java's anonymous class?
+
+It's impressive if you've developed a Android app
+
+```java
+public class MyAndroidAppActivity extends Activity {
+
+    int counter = 0; //dont't need to be final
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+
+        Button button = (Button) findViewById(R.id.button1);
+        // need to be final
+        final Button button2 = (Button) findViewById(R.id.button2);  
+
+        button.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                // access counter and button2
+            }
+        });
+    }
+}
+```
+
+
+---
+# Lambda In Java 8 ;-)
+
+
+---
+# Old days with C
+```C
+int values[] = { 88, 56, 100, 2, 25 };
+qsort(array, 5, sizeof(int), cmpfunc);
+
+```
