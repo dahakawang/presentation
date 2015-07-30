@@ -208,7 +208,11 @@ count: false
 
 --
 count: false
+.formular[
+```
 $$f(x)=\begin{cases}1 & x = 1 \\ x \times f(x-1) & x > 1\end{cases}, x\in (0, +\infty)$$
+```
+]
 
 ---
 # The non-functional way
