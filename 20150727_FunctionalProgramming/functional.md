@@ -693,6 +693,16 @@ It's the most amazing invention of LISP.
 ---
 # Code that Generates code
 
+```LISP
+(defmacro when (condition &rest body)
+  `(if ,condition (progn ,@body)))
+
+(defun foo (x)
+  (when (> x 10) (print 'big)))
+
+```
+
+
 ---
 # Extension of the language
 
@@ -723,7 +733,19 @@ Opps, we can never change C's existing language ficilities.
 # Syntax & Semantics in LISP is hackable
 
 ```LISP
+; change from prefix to infix
+(defmacro infix (x op y)
+    `(,op ,x ,y))
 
+(infix 10 + 5)  ; => 15
+(infix 10 * 2)  ; => 20
+
+
+; emulate a for each loop in LISP
+(defmacro for (item in list op)
+        `(for_each  ,list (lambda (,in) ,op)) )
+
+(for item in list (display i))
 ```
 
 ---
