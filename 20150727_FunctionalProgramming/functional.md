@@ -346,7 +346,7 @@ requires that function is just like a primitive data type (first class), and can
 # Lambda Expression
 
 - Borrowed name from Lambda Calculus
-- Java 8, C++ 11, python name after this
+- LISP, Java 8, C++ 11, python name after this
 
 
 ---
