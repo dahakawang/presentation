@@ -366,7 +366,7 @@ function closure_but_not_anonymous() {
 }
 
 
-function closure_with_anonymoous_function() {
+function closure_with_anonymous_function() {
     var im_private_env2 = 2;
 
     return () {
@@ -570,7 +570,7 @@ T add(T& x, T& y) {
 }
 
 add(3+6);  // add<int>(int&, int&) initialized
-add(string("abd") + string("dds")); // add<string>(string&, string&) is initialized
+add(string("abd") + string("dds")); // add<string>(string&, string&) initialized
 ```
 The C++ template is all about **compile time** code generation
 
@@ -673,6 +673,16 @@ end
 
 # register the hook, and add new method on the fly
 self.method_missing
+
+# eval statements
+str="class A
+   def say
+    puts 'hi'
+   end
+end"
+
+eval(str)
+A.new.say()
 ```
 Ruby on Rails (Active Record)
 
