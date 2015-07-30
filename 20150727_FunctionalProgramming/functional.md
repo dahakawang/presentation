@@ -307,7 +307,6 @@ function sub1() {
 ---
 # Not be confused with calling stack
 
-.left-column[
 ```js
 // the function that returns a closure
 function generator() {
@@ -329,18 +328,15 @@ caller(generator());
 
 
 
-
-
-
-// EOF
 ```
-]
+
+By the time we execute the anonymous function, the enclosing scope is generator's, but the last stack frame is caller's.
 
 
 ---
 class: middle, center, inverse
 # Closure = Function + Environment
-requires that function is just like a primitive data type (first class), and can be passed back and forth as parameters to other function.(higher order function)
+Also requires that function is just like a primitive data type (first class), and can be passed back and forth as parameters to other function(higher order function).
 
 ---
 # Lambda Expression
@@ -395,7 +391,7 @@ public class MyAndroidAppActivity extends Activity {
         setContentView(R.layout.main);
 
         Button button = (Button) findViewById(R.id.button1);
-        // need to be final
+        // need to be final, but not for java 8 :-)
         final Button button2 = (Button) findViewById(R.id.button2);  
 
         button.setOnClickListener(new OnClickListener() {
