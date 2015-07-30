@@ -82,11 +82,9 @@ class: middle, center, inverse
 ```LISP
 (+ 2 3) ; => 5
 
-
 (define (inc_one x)
     (+ x 1))
 (inc_one 10) ; => 11
-
 
 (define (positive? x)
     (cond
@@ -98,11 +96,13 @@ class: middle, center, inverse
 (car (cons 1 2)) ; => 1
 (cdr (cons 1 2)) ; => 2
 
-
 (cons 1 (cons 2 (cons 3 ())))  ; => (1 2 3)
 (list 1 2 3)
 (car (list 1 2 3)) ; => 1
 (cdr (list 1 2 3)) ; => (2 3)
+
+(+ 1 2) ; => it's expression
+'(+ 1 2) ; => it's data, QUOTE  <=> (quote (+ 1 2))
 ```
 
 ---
@@ -684,6 +684,88 @@ Ruby on Rails (Active Record)
 
 ---
 # LISP Macro
+
+It's the most amazing invention of LISP.
+
+- Generate code on the fly
+- Customize the language (DSL, hackable)
+
+---
+# Code that Generates code
+
+---
+# Extension of the language
+
+- core
+- standard library
+
+---
+# Syntax & Semantics is a blackbox
+
+```c
+
+int data[] = { 1, 2, 3};
+
+for (int i = 0; i < 3; i++) {
+    //process data[i]
+}
+
+// we can never have this
+for d in data {
+    // process d
+}
+
+```
+Opps, we can never change C's existing language ficilities.
+
+
+---
+# Syntax & Semantics in LISP is hackable
+
+```LISP
+
+```
+
+---
+# Analogy: A programmable C Macro
+
+Imaging we can program the C Macro, making it Turing complete
+
+```C
+
+#define for(item, keyword, list, bracket)
+    #if keyword != "in"
+        #compiler_error
+    #output
+        for(int i = 0; i < sizeof(list)/sizeof(list[0]); i++) bracket
+#end
+
+for d in data { printf("%d\n", d); }
+            
+
+```
+
+---
+# Dose it matter?
+
+--
+## Yes!
+
+--
+```c
+for(int i = 0; i < maxi; i++) {
+    for(int j = 0; j < maxj; j++) {
+        // opps, update i for mistake.
+    }
+}
+
+// compared to
+for (int i : list1) {
+    for (int j : list2) {
+    }
+}
+```
+It's less error prone to work in a higher abstraction.
 
 ---
 class: middle, center, inverse
