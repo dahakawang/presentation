@@ -65,21 +65,21 @@ class: middle, center, inverse
 ```LISP
 (+ 2 3) ; => 5
 
-(define (inc_one x)
+(defun inc_one (x)
     (+ x 1))
 (inc_one 10) ; => 11
 
-(define (positive? x)
+(defun positive? (x)
     (cond
-        [(> x 0) (1)]
-        [else (0)]))
+        ((> x 0) 1)
+        (t 0)))
 (positive? -12) ; => 0
 
 (cons 1 2) ; (1 . 2)
 (car (cons 1 2)) ; => 1
 (cdr (cons 1 2)) ; => 2
 
-(cons 1 (cons 2 (cons 3 ())))  ; => (1 2 3)
+(cons 1 (cons 2 (cons 3 NIL)))  ; => (1 2 3)
 (list 1 2 3)
 (car (list 1 2 3)) ; => 1
 (cdr (list 1 2 3)) ; => (2 3)
@@ -96,18 +96,18 @@ count: false
 
 ```LISP
 ; emulate for loop in C/C++
-(define (for_loop start end op)
+(defun for_loop (begin end op)
     (cond
-            [(< start  end) (op start) (for_loop (+ start 1) end op)]))
+            ((<= begin end) (funcall op begin) (for_loop (+ begin 1) end op))))
 
-(for_loop 1 5 (lambda (x) (display x)))
+(for_loop 1 5 #'(lambda (x) (format t "~d~%" x)))
 
 
 ; iterate a list
-(define (sum lst)
+(defun sum (lst)
     (cond
-        [(= lst ()) 0]
-        [else (+ (car lst) (sum (cdr lst)))]))
+        ((equal lst NIL) 0)
+        (t (+ (car lst) (sum (cdr lst))))))
 (sum (list 1 2 3 4)) ; => 10
 ```
 
@@ -181,7 +181,7 @@ count: false
 # The functional way
 
 ```LISP
-(define (factorial n)
+(defun factorial (n)
   (if (= n 1)
       1
       ( * n (factorial (- n 1)))))
@@ -718,17 +718,22 @@ Opps, we can never change C's existing language ficilities.
 ```LISP
 ; change from prefix to infix
 (defmacro infix (x op y)
-    `(,op ,x ,y))
+    `(,op ,x ,y)) 
 
-(infix 10 + 5)  ; => 15
-(infix 10 * 2)  ; => 20
+(infix 10 + 5)  ; => (+ 10 5) =>  15
+(infix 10 * 2)  ; => (* 10 2) =>  20
 
 
 ; emulate a for each loop in LISP
 (defmacro for (item in list op)
-        `(for_each  ,list (lambda (,in) ,op)) )
+    (if (equal in 'in) 
+        `(for_each  ,list #'(lambda (,item) ,op))
+        "error"))
 
-(for item in list (display i))
+(let (lst (list 1 2 3))
+(for elem in lst (format t "~d~%" elem)) 
+; => (for_each lst #'(lambda (elem) (format t "~d~%" elem)))
+(for var in lst (format t "~d~%" var))) ; => "error"
 ```
 
 ---
@@ -741,11 +746,12 @@ Imaging we can program the C Macro, making it Turing complete
 #define for(item, keyword, list, bracket)
     #if keyword != "in"
         #compiler_error
-    #output
-        for(int i = 0; i < sizeof(list)/sizeof(list[0]); i++) bracket
+    #else 
+        output: for(int i = 0; i < sizeof(list)/sizeof(list[0]); i++) bracket
 #end
 
 for d in data { printf("%d\n", d); }
+//for(int i = 0; i < sizeof(data)/sizeof(data[0]; i++) { printf("%d\n", d); }
             
 
 ```
