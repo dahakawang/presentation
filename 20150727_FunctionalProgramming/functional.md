@@ -89,9 +89,6 @@ class: middle, center, inverse
 ```
 
 ---
-# But.. we want the loop
-
---
 count: false
 
 ```LISP
@@ -322,13 +319,6 @@ class: middle, center, inverse
 Also requires that function is just like a primitive data type (first class), and can be passed back and forth as parameters to other function(higher order function).
 
 ---
-# Lambda Expression
-
-- Borrowed name from Lambda Calculus
-- LISP, Java 8, C++ 11, python name after this
-
-
----
 # Anonymous Function isn't a good name
 
 Also an example from js
@@ -348,15 +338,11 @@ function closure_but_not_anonymous() {
 function closure_with_anonymous_function() {
     var im_private_env2 = 2;
 
-    return () {
+    return function () {
         console.log("i'm anonymous");
     };
 }
 ```
-
----
-class: center, middle
-# Javascript has closure from the first day
 
 ---
 # Remember java's anonymous class?
@@ -406,13 +392,13 @@ translated into a method
 ```java
 class B {
     public void foo() {
-        List<Person> list = ...
-        final int bottom = ..., top = ...;
-        list.removeIf( p -> (p.size >= bottom && p.size <= top) );
+        int x = 10;
+        Runnable r = () -> System.out.println(x); 
+        r.run();
     }
 
-    static boolean lambda$1(int bottom, int top, Person p) {
-        return (p.size >= bottom && p.size <= top;
+    static void lambda$1(int x) {
+        System.out.println(x);
     }
 }
 ```
@@ -470,7 +456,7 @@ public:
     Adder(int n):num(n) {};
     int operator()(int x) { return x + num; }
 
-pricate:
+private:
     int num;
 };
 
@@ -532,7 +518,7 @@ Once we regard code as a kind of data, we can have ability to inspect the proper
 ---
 # Template
 
-It's a way to implements Generics
+Can be used to implements Generics
 
 ```c++
 template<typename T>
@@ -548,8 +534,8 @@ T add(T& x, T& y) {
     return x + y;
 }
 
-add(3+6);  // add<int>(int&, int&) initialized
-add(string("abd") + string("dds")); // add<string>(string&, string&) initialized
+add(3, 6);  // add<int>(int&, int&) initialized
+add(string("abd"), string("dds")); // add<string>(string&, string&) initialized
 ```
 The C++ template is all about **compile time** code generation
 
@@ -733,7 +719,7 @@ Opps, we can never change C's existing language ficilities.
 (let (lst (list 1 2 3))
 (for elem in lst (format t "~d~%" elem)) 
 ; => (for_each lst #'(lambda (elem) (format t "~d~%" elem)))
-(for var in lst (format t "~d~%" var))) ; => "error"
+(for var from lst (format t "~d~%" var))) ; => "error"
 ```
 
 ---
@@ -771,8 +757,8 @@ for(int i = 0; i < maxi; i++) {
 }
 
 // compared to
-for (int i : list1) {
-    for (int j : list2) {
+for (int var1 : list1) {
+    for (int var2 : list2) {
     }
 }
 ```
