@@ -1,50 +1,82 @@
+#include <cmath>
+#include <cstdio>
 #include <vector>
 #include <iostream>
 #include <algorithm>
-#include <cmath>
 #include <climits>
-#include <functional>
-#include <numeric>
-#include <utility>
-#include <set>
-#include <sstream>
-#include <map>
-#include <cstring>
+using namespace std;
 
-using std::vector;
-using std::string;
-using std::pair;
-using std::map;
 
-class Solution {
-public:
-    int minDistance(string word1, string word2) {
-        if (word1.empty()) return word2.size();
-        if (word2.empty()) return word1.size();
+vector<int64_t> get_sum(vector<int64_t>& v, int64_t mod) {
+    vector<int64_t> sum(v.size() + 1);
+    sum[0] = 0;
 
-        vector<vector<int>> dist(word1.size(), vector<int>(word2.size(), 0));
-        dist[0][0] = (word1[0] == word2[2])? 0 : 1;
-        for(int i = 1; i < word1.size(); ++i) dist[i][0] = dist[i-1][0] + 1;
-        for(int i = 1; i < word2.size(); ++i) dist[0][i] = dist[0][i-1] + 1;
+    for(int i = 0; i < v.size(); ++i) sum[i + 1] = (v[i] + sum[i]) % mod;
 
-        for(int i = 1; i < word1.size(); ++i) {
-            for(int j = 1; j < word2.size(); ++j) {
-                if (word1[i] == word2[j]) {
-                    dist[i][j] = dist[i-1][j-1];
-                } else {
-                    dist[i][j] = std::min(dist[i-1][j], dist[i][j-1]);
-                    dist[i][j] = std::min(dist[i][j], dist[i-1][j-1]);
-                    ++dist[i][j];
-                }
-            }
+    return sum;
+}
+
+inline int64_t get_mod(int64_t left, int64_t right, int64_t mod) {
+    return (right - left + mod) % mod;
+}
+
+int64_t find_max(vector<int64_t>& v, int begin, int mid, int end, int64_t mod) {
+
+}
+
+void merge(vector<int64_t>& v, vector<int64_t>& tmp, int begin, int mid, int end) {
+    int left = begin, right = mid;
+    for(int i = begin; i < end; ++i) {
+        int64_t left_val = (left < mid)? v[left] : LLONG_MAX;
+        int64_t right_val = (right_val < end)? v[right] : LLONG_MAX;
+        if (left_val < right_val) {
+            tmp[i] = left_val;
+            ++left;
+        } else {
+            tmp[i] = right_val;
+            ++right;
         }
-
-        return dist[word1.size()-1][word2.size()-1];
     }
-};
+    std:copy(tmp.begin() + begin, tmp.begin() + end, v.begin() + begin);
+}
+
+int64_t find_max(vector<int64_t>& v, vector<int64_t>& tmp, int begin, int end, int64_t mod) {
+    if (end - begin == 1) {
+        return v[begin];
+    }
+
+    int mid = begin + (end - begin) / 2;
+    int64_t left = find_max(v, tmp, begin, mid, mod);
+    int64_t right = find_max(v, tmp, mid, end, mod);
+
+    //left and right is sorted
+    int64_t me = find_max(v, begin, mid, end, mod);
+
+    merge(v, tmp, begin, mid, end);
+
+    return std::max(std::max(left, right), me);
+}
+
+int64_t find_max(vector<int64_t>& v, int64_t mod) {
+    auto sum = get_sum(v, mod);
+    vector<int64_t> tmp;
+
+    return find_max(sum, tmp, 0, sum.size(), mod);
+}
+
 
 int main() {
-    Solution s;
-    std::cout << s.minDistance("abcdefgh", "abcdefgh") << std::endl;
+    /* Enter your code here. Read input from STDIN. Print output to STDOUT */
+    int cntCase;
+    cin >> cntCase;
+
+    for(int i = 0; i < cntCase; ++i) {
+        int64_t length, mod;
+        cin >> length >> mod;
+        vector<int64_t> v(length);
+        for(int j = 0; j < length; ++j) cin >> v[j];
+
+        cout << find_max(v, mod) << endl;;
+    }
     return 0;
 }
