@@ -1,82 +1,69 @@
-#include <cmath>
-#include <cstdio>
-#include <vector>
 #include <iostream>
+#include <vector>
 #include <algorithm>
-#include <climits>
+
 using namespace std;
 
+class Solution {
+public:
+    vector<bool> precompute(string& word) {
+    }
 
-vector<int64_t> get_sum(vector<int64_t>& v, int64_t mod) {
-    vector<int64_t> sum(v.size() + 1);
-    sum[0] = 0;
+    vector<vector<bool>> precompute(vector<string>& words) {
+        vector<vector<bool>> table;
 
-    for(int i = 0; i < v.size(); ++i) sum[i + 1] = (v[i] + sum[i]) % mod;
-
-    return sum;
-}
-
-inline int64_t get_mod(int64_t left, int64_t right, int64_t mod) {
-    return (right - left + mod) % mod;
-}
-
-int64_t find_max(vector<int64_t>& v, int begin, int mid, int end, int64_t mod) {
-
-}
-
-void merge(vector<int64_t>& v, vector<int64_t>& tmp, int begin, int mid, int end) {
-    int left = begin, right = mid;
-    for(int i = begin; i < end; ++i) {
-        int64_t left_val = (left < mid)? v[left] : LLONG_MAX;
-        int64_t right_val = (right_val < end)? v[right] : LLONG_MAX;
-        if (left_val < right_val) {
-            tmp[i] = left_val;
-            ++left;
-        } else {
-            tmp[i] = right_val;
-            ++right;
+        for(auto& line : words) {
+            table.push_back(precompute(line));
         }
-    }
-    std:copy(tmp.begin() + begin, tmp.begin() + end, v.begin() + begin);
-}
-
-int64_t find_max(vector<int64_t>& v, vector<int64_t>& tmp, int begin, int end, int64_t mod) {
-    if (end - begin == 1) {
-        return v[begin];
+        return table;
     }
 
-    int mid = begin + (end - begin) / 2;
-    int64_t left = find_max(v, tmp, begin, mid, mod);
-    int64_t right = find_max(v, tmp, mid, end, mod);
+    bool is_palindrom(vector<string>& words, vector<vector<bool>>& table, size_t first, size_t second) {
+        size_t left = 0, right = 0;
+        if (words[first].size() > words[first].size()) {
+            size_t mid = words[first].size() + words[second].size();
+            if (!table[first][mid]) return false;
+        } else {
+            size_t mid = table[second].size() - (words[first].size() + words[second].size()) - 1;
+            if (!table[second][mid]) return false;
+        }
 
-    //left and right is sorted
-    int64_t me = find_max(v, begin, mid, end, mod);
-
-    merge(v, tmp, begin, mid, end);
-
-    return std::max(std::max(left, right), me);
-}
-
-int64_t find_max(vector<int64_t>& v, int64_t mod) {
-    auto sum = get_sum(v, mod);
-    vector<int64_t> tmp;
-
-    return find_max(sum, tmp, 0, sum.size(), mod);
-}
-
-
-int main() {
-    /* Enter your code here. Read input from STDIN. Print output to STDOUT */
-    int cntCase;
-    cin >> cntCase;
-
-    for(int i = 0; i < cntCase; ++i) {
-        int64_t length, mod;
-        cin >> length >> mod;
-        vector<int64_t> v(length);
-        for(int j = 0; j < length; ++j) cin >> v[j];
-
-        cout << find_max(v, mod) << endl;;
+        while(left != 0) {
+            if (words[left] != words[right]) return false;
+            --left; ++right;
+        }
+        return true;
     }
+
+    vector<vector<int>> palindromePairs(vector<string>& words) {
+        vector<vector<bool>> table = precompute(words);
+        vector<vector<int>> result;
+        for (size_t first = 0; first < words.size(); ++first) {
+            for (size_t second = 0; second < words.size(); ++second) {
+                if (first == second) continue;
+                if (is_palindrom(words, table, first, second)) {
+                    result.push_back({static_cast<int>(first), static_cast<int>(second)});
+                }
+            }
+        }
+        return result;
+    }
+};
+
+int main(int argc, char *argv[]) {
+    vector<string> s;
+    string line;
+    while(cin >> line) {
+        s.push_back(line);
+    }
+    Solution so;
+    auto v = so.palindromePairs(s);
+    for(auto& v1 : v) {
+        for(auto n : v1) {
+            std::cout << n << " ";
+        }
+        std::cout <<std::endl;
+    }
+
     return 0;
 }
