@@ -3,138 +3,133 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
-#include <unistd.h>
-#include <sys/fcntl.h>
-#include <sys/stat.h>
-#include <sys/mman.h>
+#include <sstream>
+#include <iomanip>
 using namespace std;
 
-void fill(char* data, size_t size) {
-    for (size_t i = 0; i < size; ++i) {
-        data[i] = 0; //rand();
-    }
-}
-
-void fill_data(const string& filename, size_t size, size_t cache_size) {
-    int fd = open(filename.c_str(), O_TRUNC | O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-    if (fd < 0) {
-        perror("error open file");
+class BigDicimal {
+public:
+    BigDicimal(int64_t num) {
+        while (num != 0) {
+            digits.push_back(num % LENGTH);
+            num /= LENGTH;
+        }
     }
 
-    char* buffer = (char*) malloc(cache_size);
-    size_t cur_size = 0;
-    while (cur_size < size ) {
-        size_t block_size = (cur_size + cache_size > size)? size - cur_size : cache_size;
-        fill(buffer, block_size);
+    BigDicimal() = default;
 
-        if (write(fd, buffer, block_size) != (int) block_size) {
-            perror("error write");
-            free(buffer);
-            return;
+    void _add(const vector<uint64_t>& longer, const vector<uint64_t>& shorter, vector<uint64_t>& r) const {
+        r.clear();
+        uint64_t addin = 0;
+        for (size_t i = 0; i < shorter.size(); ++i) {
+            uint64_t sum = longer[i] + shorter[i] + addin;
+            r.push_back(sum % LENGTH);
+            addin = sum / LENGTH;
         }
 
-        cur_size += block_size;
+        for (size_t i = shorter.size(); i < longer.size(); ++i) {
+            uint64_t sum = longer[i] + addin;
+            r.push_back(sum % LENGTH);
+            addin = sum / LENGTH;
+        }
+        if (addin != 0) r.push_back(addin);
     }
-    free(buffer);
+
+    void add(const vector<uint64_t>& left, const vector<uint64_t>& right, vector<uint64_t>& r) const {
+        if (left.size() < right.size()) {
+            _add(right, left, r);
+        } else {
+            _add(left, right, r);
+        }
+    }
+
+    BigDicimal operator+(const BigDicimal& other) const {
+        BigDicimal r;
+        const vector<uint64_t> &left = this->digits, &right = other.digits;
+        vector<uint64_t> &result = r.digits;
+        add(left, right, result);
+
+        return r;
+    }
+    void multiply(const vector<uint64_t>& num, uint64_t digit, int offset, vector<uint64_t>& r) const {
+        r.clear();
+        for (int i = 0; i < offset; i++) r.push_back(0);
+        uint64_t addin = 0;
+        for (size_t i = 0; i < num.size(); ++i) {
+            uint64_t tmp = digit * num[i] + addin;
+            r.push_back(tmp % LENGTH);
+            addin = tmp / LENGTH;
+        }
+        if (addin != 0) r.push_back(addin);
+    }
+
+    void multiply(const vector<uint64_t>& longer, const vector<uint64_t>& shorter, vector<uint64_t>& r) const {
+        r.clear();
+
+        for (size_t i = 0; i < shorter.size(); ++i) {
+            vector<uint64_t> tmp, tmp1;
+            multiply(longer, shorter[i], i, tmp);
+            add(r, tmp, tmp1);
+            swap(tmp1, r);
+        }
+    }
+
+    BigDicimal operator*(const BigDicimal& other) const {
+        BigDicimal r;
+        const vector<uint64_t> &left = this->digits, &right = other.digits;
+        vector<uint64_t> &result = r.digits;
+        if (left.size() < right.size()) {
+            multiply(right, left, result);
+        } else {
+            multiply(left, right, result);
+        }
+
+        return r;
+    }
+
+    string str() {
+        stringstream stream;
+        stream << std::setfill('0');
+
+        for (int i = (int) digits.size() - 1; i >= 0; --i) {
+            if (i == (int) digits.size() - 1) stream << std::setw(0);
+            else stream << std::setw(SIZE);
+            stream << digits[i];
+        }
+        return stream.str();
+    }
+
+private:
+    const static uint64_t LENGTH = 10000000;
+    const static uint64_t SIZE = 7;
+    vector<uint64_t> digits;
+};
+
+string fib(BigDicimal num, BigDicimal num1, int n) {
+    for (int i = 0; i < n - 2; i++) {
+        BigDicimal num2 = num1 * num1 + num;
+        num = num1;
+        num1 = num2;
+    }
+
+    return num1.str();
 }
 
-int main_writer(int argc, char* argv[]) {
-    if (argc != 4) {
-        std::cerr << "error argument" << std::endl;
-        return 1;
-    }
+int main() {
+    /*
+    int num, num1, n;
+    cin >> num >> num1 >> n;
+    std::cout << fib(num, num1, n) << std::endl;
+    */
 
-    int64_t size = (int64_t)atoi(argv[2]) * 1024 * 1024;
-    int cache_size = atoi(argv[3]);
-    std::cout << size << std::endl;
-    fill_data(argv[1], size, cache_size);
+    while(1) {
+        int64_t a,b;
+        cin >> a >> b;
+        BigDicimal a1(a), b1(b);
+        BigDicimal r = a1 * b1;
+        cout << r.str() << endl;
+    }
 
     return 0;
+
 }
-
-int main_mmap(int argc, char *argv[]) {
-    if (argc != 2) {
-        std::cerr << "wrong argument" << std::endl;
-        return 1;
-    }
-
-    struct stat file_info;
-    if (stat(argv[1], &file_info) < 0) {
-        perror("error get file size");
-        return 1;
-    }
-
-    int fd = open(argv[1], O_RDONLY);
-    if (fd < 0) {
-        perror("error open file");
-        return 1;
-    }
-
-    char* mapped =(char*)  mmap(NULL, file_info.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
-    int64_t total = 0;
-    for (size_t i = 0; i < (size_t) file_info.st_size; ++i) total += mapped[i];
-    std::cout << (file_info.st_size / 1024 / 1024 / 1024 )<< " GB processed" << std::endl;
-    std::cout << total << std::endl;
-
-    close(fd);
-    return 0;;
-}
-
-int main_read(int argc, char *argv[]) {
-    if (argc != 3) {
-        std::cerr << "wrong argument" << std::endl;
-        return 1;
-    }
-
-    int cache_size = atoi(argv[2]);
-    int fd = open(argv[1], O_RDONLY);
-    if (fd < 0) {
-        perror("error open file");
-        return 1;
-    }
-
-    int64_t total = 0;
-    char* buffer = (char*) malloc(cache_size);
-    ssize_t ret, total_size = 0;
-    while(( ret = read(fd, buffer, cache_size) ) > 0) {
-        total_size += ret;
-        for(int i = 0; i < ret; ++i) total += buffer[i];
-    }
-    if (ret != 0) {
-        perror("error reading");
-        free(buffer);
-        close(fd);
-        return 1;;
-    }
-    std::cout << (total_size / 1024 / 1024 / 1024) << " GB read" << std::endl;
-    std::cout << total << std::endl;
-
-    free(buffer);
-    close(fd);
-    return 0;;
-}
-
-int main(int argc, char *argv[]) {
-    if (argc < 2) {
-        std::cerr << "wrong argument"  << std::endl;
-        return 1;
-    }
-
-    string subcommand = argv[1];
-    vector<char*> sub_argv; sub_argv.reserve(argc - 1);
-    sub_argv.push_back(argv[0]);
-    std::copy(argv + 2, argv + argc, back_inserter(sub_argv));
-
-    if (subcommand == "writer") {
-        return main_writer(sub_argv.size(), sub_argv.data());
-    } else if (subcommand == "reader") {
-        return main_read(sub_argv.size(), sub_argv.data());
-    } else if (subcommand == "mmap") {
-        return main_mmap(sub_argv.size(), sub_argv.data());
-    } else {
-        std::cerr << "undefined subcommand" << std::endl;
-        return 1;
-    }
-    return 0;
-}
-
