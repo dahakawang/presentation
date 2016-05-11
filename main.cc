@@ -1,135 +1,132 @@
-#include <cmath>
-#include <cstdio>
-#include <vector>
 #include <iostream>
-#include <algorithm>
-#include <sstream>
-#include <iomanip>
+#include <functional>
+#include <cassert>
+#include <vector>
+
 using namespace std;
 
-class BigDicimal {
-public:
-    BigDicimal(int64_t num) {
-        while (num != 0) {
-            digits.push_back(num % LENGTH);
-            num /= LENGTH;
-        }
-    }
 
-    BigDicimal() = default;
+enum DIRECTION { UP = 1, DOWN = 2, LEFT = 4, RIGHT = 8, NONE };
 
-    void _add(const vector<uint64_t>& longer, const vector<uint64_t>& shorter, vector<uint64_t>& r) const {
-        r.clear();
-        uint64_t addin = 0;
-        for (size_t i = 0; i < shorter.size(); ++i) {
-            uint64_t sum = longer[i] + shorter[i] + addin;
-            r.push_back(sum % LENGTH);
-            addin = sum / LENGTH;
-        }
+DIRECTION rand_direction(int h, int w, vector<vector<int>>& maze, vector<vector<bool>>& visited) {
+    vector<DIRECTION> direction; direction.reserve(4);
+   
+    if (h - 1 >= 0 && !visited[h - 1][w]) direction.push_back(UP);
+    if (h + 1 < (int)maze.size() && !visited[h + 1][w]) direction.push_back(DOWN);
+    if (w - 1 >= 0 && !visited[h][w - 1]) direction.push_back(LEFT);
+    if (w + 1 < (int)maze[h].size() && !visited[h][w + 1]) direction.push_back(RIGHT);
 
-        for (size_t i = shorter.size(); i < longer.size(); ++i) {
-            uint64_t sum = longer[i] + addin;
-            r.push_back(sum % LENGTH);
-            addin = sum / LENGTH;
-        }
-        if (addin != 0) r.push_back(addin);
-    }
-
-    void add(const vector<uint64_t>& left, const vector<uint64_t>& right, vector<uint64_t>& r) const {
-        if (left.size() < right.size()) {
-            _add(right, left, r);
-        } else {
-            _add(left, right, r);
-        }
-    }
-
-    BigDicimal operator+(const BigDicimal& other) const {
-        BigDicimal r;
-        const vector<uint64_t> &left = this->digits, &right = other.digits;
-        vector<uint64_t> &result = r.digits;
-        add(left, right, result);
-
-        return r;
-    }
-    void multiply(const vector<uint64_t>& num, uint64_t digit, int offset, vector<uint64_t>& r) const {
-        r.clear();
-        for (int i = 0; i < offset; i++) r.push_back(0);
-        uint64_t addin = 0;
-        for (size_t i = 0; i < num.size(); ++i) {
-            uint64_t tmp = digit * num[i] + addin;
-            r.push_back(tmp % LENGTH);
-            addin = tmp / LENGTH;
-        }
-        if (addin != 0) r.push_back(addin);
-    }
-
-    void multiply(const vector<uint64_t>& longer, const vector<uint64_t>& shorter, vector<uint64_t>& r) const {
-        r.clear();
-
-        for (size_t i = 0; i < shorter.size(); ++i) {
-            vector<uint64_t> tmp, tmp1;
-            multiply(longer, shorter[i], i, tmp);
-            add(r, tmp, tmp1);
-            swap(tmp1, r);
-        }
-    }
-
-    BigDicimal operator*(const BigDicimal& other) const {
-        BigDicimal r;
-        const vector<uint64_t> &left = this->digits, &right = other.digits;
-        vector<uint64_t> &result = r.digits;
-        if (left.size() < right.size()) {
-            multiply(right, left, result);
-        } else {
-            multiply(left, right, result);
-        }
-
-        return r;
-    }
-
-    string str() {
-        stringstream stream;
-        stream << std::setfill('0');
-
-        for (int i = (int) digits.size() - 1; i >= 0; --i) {
-            if (i == (int) digits.size() - 1) stream << std::setw(0);
-            else stream << std::setw(SIZE);
-            stream << digits[i];
-        }
-        return stream.str();
-    }
-
-private:
-    const static uint64_t LENGTH = 10000000;
-    const static uint64_t SIZE = 7;
-    vector<uint64_t> digits;
-};
-
-string fib(BigDicimal num, BigDicimal num1, int n) {
-    for (int i = 0; i < n - 2; i++) {
-        BigDicimal num2 = num1 * num1 + num;
-        num = num1;
-        num1 = num2;
-    }
-
-    return num1.str();
+    if (direction.empty()) return NONE;
+    return direction[rand() % direction.size()];
 }
 
-int main() {
-    /*
-    int num, num1, n;
-    cin >> num >> num1 >> n;
-    std::cout << fib(num, num1, n) << std::endl;
-    */
+int count = 0;
 
-    while(1) {
-        int64_t a,b;
-        cin >> a >> b;
-        BigDicimal a1(a), b1(b);
-        BigDicimal r = a1 * b1;
-        cout << r.str() << endl;
+void _gen(int h, int w, vector<vector<int>>& maze, vector<vector<bool>>& visited) {
+    //int trace = count++;
+    visited[h][w] = true;
+
+    DIRECTION dir = rand_direction(h, w, maze, visited);
+    while(dir != NONE) {
+        switch (dir) {
+            case UP:
+                //cout << trace << " UP" << endl;
+                maze[h][w] |= UP;
+                maze[h - 1][w] |= DOWN;
+                _gen(h - 1, w, maze, visited);
+                break;
+            case DOWN:
+                //cout << trace << " DOWN" << endl;
+                maze[h][w] |= DOWN;
+                maze[h + 1][w] |= UP;
+                _gen(h + 1, w, maze, visited);
+                break;
+            case LEFT:
+                //cout << trace << " LEFT" << endl;
+                maze[h][w] |= LEFT;
+                maze[h][w - 1] |= RIGHT;
+                _gen(h, w - 1, maze, visited);
+                break;
+            case RIGHT:
+                //cout << trace << " RIGHT" << endl;
+                maze[h][w] |= RIGHT;
+                maze[h][w + 1] |= LEFT;
+                _gen(h, w + 1, maze, visited);
+                break;
+            default:
+                //cout << trace << " NONE" << endl;
+                return;
+        }
+        dir = rand_direction(h, w, maze, visited);
     }
+}
 
+vector<vector<int>> generate(int width, int height) {
+    vector<vector<int>> maze(height, vector<int>(width, 0));
+    vector<vector<bool>> visited(height, vector<bool>(width, false));
+    if (width <= 0 || height <= 0) return maze;
+
+    srand(time(NULL));
+    _gen(0, 0, maze, visited);
+
+    return maze;
+}
+
+void print(const vector<vector<int>>& maze) {
+    for (auto& line : maze) {
+        for (auto& cell : line ) {
+            if (cell & UP) cout << "UP ";
+            if (cell & DOWN) cout << "DOWN ";
+            if (cell & LEFT) cout << "LEFT ";
+            if (cell & RIGHT) cout << "RIGHT";
+            cout << ",  ";
+        }
+        cout << endl;
+    }
+}
+
+string gen_svg_open(int height, int width) {
+
+    char buffer[10240];
+    sprintf(buffer, "<svg height=\"%d\" width=\"%d\">\n", height, width);
+    return buffer;
+}
+
+string svg_line(int x1, int y1, int x2, int y2) {
+    char buffer[10240];
+    sprintf(buffer, "<line x1=\"%d\" y1=\"%d\" x2=\"%d\" y2=\"%d\" style=\"stroke:rgb(0,0,0);stroke-width:2\" />\n", x1, y1, x2, y2);
+    return buffer;
+}
+
+string gen_lines(const vector<vector<int>>& maze, int thick, int height, int width) {
+    //svn_line(0, 0, )
+    return "";
+}
+
+string gen_svg(const vector<vector<int>>& maze) {
+    const int thick = 10;
+    int height = maze.size() * thick;
+    int width = maze[0].size() * thick;
+
+    string graph =
+        "<!DOCTYPE html>\n"
+        "<html>\n"
+        "<body>\n";
+
+    graph += gen_svg_open(height, width);
+    graph += gen_lines(maze, thick, height, width);
+
+
+    graph += "</svg>\n";
+    graph += 
+        "</body>\n"
+        "</body>"; 
+    return graph;
+}
+
+int main(int argc, char *argv[]) {
+    auto maze = generate(5,5);
+    auto svg = gen_svg(maze);
+    std::cout << svg << std::endl;
     return 0;
-
 }
